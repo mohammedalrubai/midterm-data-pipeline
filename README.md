@@ -1,6 +1,6 @@
 # Midterm Data Pipeline - Hybrid ELT System
 
-## المشروع النصفي — مقرر البيانات الضخمة | جامعة الرازي
+##
 
 بناء خط بيانات هجين لمعالجة بيانات طلبات متجر إلكتروني باستخدام Python Batch + Apache Spark + MongoDB.
 
