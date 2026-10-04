@@ -61,7 +61,6 @@ python -m pytest tests/ -v
 
 ### 1. الاستعلامات والفهارس
 ```bash
-# تشغيل جميع الاستعلامات مع Explain (قبل وبعد الفهارس)
 python src/queries.py
 ```
 - **5 استعلامات**: orders_in_city, orders_by_status, customer_total_spending, quarantine_by_error_code, city_status_compound
@@ -70,7 +69,6 @@ python src/queries.py
 
 ### 2. التجميعات (5 تقارير)
 ```bash
-# تشغيل جميع التقارير
 python src/aggregations.py
 ```
 - sales_by_city — المبيعات حسب المدينة
@@ -81,7 +79,6 @@ python src/aggregations.py
 
 ### 3. العروض المادية (Materialized Views)
 ```bash
-# بناء وتحديث العروض المادية
 python src/materialized_views.py
 ```
 - **daily_sales_summary** — ملخص المبيعات اليومية حسب التاريخ والمدينة
@@ -90,16 +87,14 @@ python src/materialized_views.py
 
 ### 4. المهام المجدولة (Scheduled Jobs)
 ```bash
-# تشغيل جميع المهام يدوياً
 python src/scheduler.py
 ```
 - **refresh_views** — تحديث Materialized Views
-- **daily_report** — تقرير يومي شامل (إحصائيات المبيعات والعملاء)
+- **daily_report** — تقرير يومي شامل
 - كل مهمة تسجّل: وقت البداية والنهاية، حالة النجاح/الفشل، النتيجة
 
 ### 5. واجهة API الموحدة (FastAPI)
 ```bash
-# تشغيل خادم API
 python src/api.py
 ```
 ثم افتح **Swagger UI**: http://localhost:8000/docs
