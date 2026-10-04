@@ -3,204 +3,213 @@ Phase 1 + Phase 2
 جامعة الرازي -- كلية الحاسوب وتقنية المعلومات
 التخصص: الذكاء الاصطناعي -- المستوى الرابع
 اسم الطالب: محمد يوسف حمود سعيد الربيعي
-📌 1. نبذة عن المشروع
-هذا المشروع عبارة عن نظام Hybrid ELT Data Pipeline لمعالجة وتحليل بيانات الطلبات المخزنة في ملفات CSV.
-يعتمد النظام على اختيار طريقة المعالجة المناسبة حسب حجم الملف:
-Python Batch Processing للملفات الصغيرة.
+📋 Project Overview
+هذا المشروع عبارة عن Hybrid ELT System لمعالجة وتحليل بيانات الطلبات القادمة من ملفات CSV.
+يعتمد النظام على اختيار محرك المعالجة المناسب حسب حجم الملف:
+Python Batch للملفات الصغيرة.
 Apache Spark / PySpark للملفات الكبيرة.
-MongoDB لتخزين البيانات ومعالجتها وتحليلها.
-FastAPI لتوفير واجهة REST API للوصول إلى وظائف النظام.
-يمر المشروع بمراحل تبدأ من قراءة ملف CSV، ثم تحديد محرك المعالجة، وتحميل البيانات الخام، وتنظيفها والتحقق منها، وتصنيف السجلات، ثم تخزين النتائج وإنشاء التقارير والتحليلات.
-📚 2. محتويات المشروع
-فكرة النظام
-المعمارية العامة
-Phase 1 - Data Pipeline
+MongoDB لتخزين البيانات الخام والنهائية وتنفيذ عمليات التحليل.
+FastAPI لتوفير واجهة موحدة للوصول إلى وظائف النظام.
+يمر الـ Pipeline بمراحل واضحة:
+CSV File
+   ↓
 File Router
-Batch Processing
-Spark Processing
+   ↓
+Python Batch / PySpark
+   ↓
+orders_raw
+   ↓
+Cleaning + Validation
+   ↓
+Valid / Corrected / Quarantine
+   ↓
+orders_validated / orders_quarantine
+   ↓
+Analytics + Reports
+   ↓
+Materialized Views
+   ↓
+FastAPI
+📚 Table of Contents
+Project Overview
+Project Objectives
+System Architecture
+Phase 1 - Hybrid ELT Pipeline
+File Router
+Python Batch Processing
+PySpark Processing
 Raw Data Layer
 Data Cleaning & Validation
 Classification & Quarantine
-Idempotency
-Metrics
-Phase 2 - Analytics
-Queries & Indexes
+Idempotency & Upsert
+Metrics & Consistency
+Phase 2 - Analytics Layer
+Queries, Indexes & Explain
 Aggregation Reports
 Materialized Views
 Scheduled Jobs
 FastAPI
 Project Structure
-Installation
-Running
+Installation & Configuration
+Running the Project
 Testing
 MongoDB Collections
 Technologies
+End-to-End Flow
+Conclusion
 GitHub
-💡 3. فكرة النظام
-المشكلة التي يعالجها المشروع هي التعامل مع ملفات بيانات تختلف في:
-الحجم.
-جودة البيانات.
-صحة القيم.
-إمكانية إعادة تشغيل الـ Pipeline.
-لذلك تم بناء النظام ليختار محرك المعالجة تلقائياً.
-التدفق الأساسي
-CSV File
-   │
-   ▼
-File Router
-   │
-   ├──────────────► Small File ──────────► Python Batch
-   │
-   └──────────────► Large File ──────────► PySpark
-                                             │
-                                             ▼
-                                         MongoDB
-                                             │
-                                             ▼
-                                      orders_raw
-                                             │
-                                             ▼
-                                  Cleaning & Validation
-                                             │
-                              ┌──────────────┼──────────────┐
-                              ▼              ▼              ▼
-                            Valid         Corrected      Quarantine
-                              │              │              │
-                              └──────┬───────┘              │
-                                     ▼                      ▼
-                              orders_validated       orders_quarantine
-                                     │
-                                     ▼
-                                Analytics
-                                     │
-                         ┌───────────┼───────────┐
-                         ▼           ▼           ▼
-                      Reports     Views       FastAPI
-🏗️ 4. المعمارية العامة
-يعتمد المشروع على طبقات واضحة:
-Layer 1 --- Input
-ملفات CSV التي تحتوي على بيانات الطلبات.
-Layer 2 --- Router
-يحدد محرك المعالجة المناسب بناءً على حجم الملف.
-Layer 3 --- Processing
-Python Batch للملفات الصغيرة.
-PySpark للملفات الكبيرة.
-Layer 4 --- Raw Data
-تحميل البيانات الأصلية إلى:
-orders_raw
-Layer 5 --- Transformation
-تنظيف البيانات والتحقق من صحتها.
-Layer 6 --- Classification
-تصنيف السجلات إلى:
-VALID
-CORRECTED
-QUARANTINE
-Layer 7 --- Final Data
-تخزين البيانات المقبولة في:
-orders_validated
-والبيانات غير المقبولة في:
-orders_quarantine
-Layer 8 --- Analytics
-تشمل:
-Queries
-Indexes
-Aggregations
-Materialized Views
-Scheduled Jobs
-FastAPI
-🔵 5. Phase 1 - Data Pipeline
-Phase 1 هي المرحلة الأساسية للمشروع، وتركز على بناء Pipeline قادر على قراءة البيانات وتحميلها وتنظيفها والتحقق منها.
-مراحل Phase 1
-Extract
-   ↓
-Route
-   ↓
-Load
-   ↓
-Clean
-   ↓
-Validate
-   ↓
-Classify
-   ↓
-Upsert
-   ↓
-Metrics
-📂 6. File Router
-يستخدم النظام حدّاً قدره:
+🎯 Project Objectives
+يهدف المشروع إلى بناء نظام عملي يستطيع:
+معالجة ملفات CSV صغيرة وكبيرة.
+اختيار محرك المعالجة تلقائياً.
+تحميل البيانات الخام قبل التنظيف.
+تطبيق قواعد Data Cleaning وValidation.
+تصنيف البيانات إلى Valid وCorrected وQuarantine.
+الاحتفاظ بمعلومات تتبع مصدر البيانات.
+تنفيذ Idempotent Upsert.
+إنتاج Metrics ونتائج تشغيل.
+تنفيذ استعلامات وتحليلات على البيانات.
+إنشاء Materialized Views.
+تنفيذ مهام مجدولة.
+توفير REST API من خلال FastAPI.
+🏗️ System Architecture
+                         ┌─────────────┐
+                         │   CSV File  │
+                         └──────┬──────┘
+                                │
+                                ▼
+                         ┌─────────────┐
+                         │ File Router │
+                         └──────┬──────┘
+                                │
+                 ┌──────────────┴──────────────┐
+                 │                             │
+                 ▼                             ▼
+          Small File                     Large File
+                 │                             │
+                 ▼                             ▼
+          Python Batch                    PySpark
+                 │                             │
+                 └──────────────┬──────────────┘
+                                ▼
+                         ┌─────────────┐
+                         │ orders_raw  │
+                         └──────┬──────┘
+                                │
+                                ▼
+                   ┌──────────────────────┐
+                   │ Cleaning + Validation│
+                   └──────────┬───────────┘
+                              │
+                 ┌────────────┼────────────┐
+                 ▼            ▼            ▼
+               VALID       CORRECTED   QUARANTINE
+                 │            │            │
+                 └──────┬─────┘            ▼
+                        ▼            orders_quarantine
+                orders_validated
+                        │
+                        ▼
+                  Analytics Layer
+                        │
+        ┌───────────────┼────────────────┐
+        ▼               ▼                ▼
+     Queries       Aggregations     Materialized
+                                       Views
+                                          │
+                                          ▼
+                                      Scheduler
+                                          │
+                                          ▼
+                                       FastAPI
+🔵 Phase 1 - Hybrid ELT Pipeline
+1. ELT Concept
+المشروع يعتمد على مفهوم:
+Extract → Load → Transform
+أي أن البيانات يتم:
+استخراجها من CSV.
+تحميلها إلى MongoDB في Raw Layer.
+تنفيذ عمليات التنظيف والتحويل بعد التحميل.
+وهذا يحافظ على البيانات الأصلية قبل تطبيق التحويلات.
+📂 File Router
+يستخدم المشروع حدًا قدره:
 200 MB
-لتحديد طريقة المعالجة.
-القاعدة
-File < 200 MB
-      ↓
+لاختيار محرك المعالجة.
+Routing Rule
+File Size < 200 MB
+        ↓
 Python Batch
 
-File >= 200 MB
-      ↓
+
+File Size >= 200 MB
+        ↓
 PySpark
-ميزة هذا التصميم أن المستخدم لا يحتاج إلى اختيار المحرك يدوياً.
-🐍 7. Python Batch Processing
-يتم استخدام Python لمعالجة الملفات الصغيرة.
-بدلاً من تحميل الملف بالكامل في الذاكرة، تتم قراءة البيانات على شكل Batches.
+وبذلك يتم اختيار طريقة المعالجة تلقائياً.
+🐍 Python Batch Processing
+للملفات الصغيرة يستخدم المشروع Python Batch Processing.
+لا يتم الاعتماد على تحميل الملف بالكامل في الذاكرة، وإنما تتم قراءة البيانات على دفعات.
 CSV
  ↓
 Read Batch
  ↓
-Process
+Create Documents
  ↓
 MongoDB
  ↓
 Next Batch
-وهذا يساعد على تقليل استهلاك الذاكرة أثناء المعالجة.
-⚡ 8. PySpark Processing
-عند التعامل مع الملفات الكبيرة يستخدم النظام:
+هذا التصميم يساعد على التحكم في استهلاك الذاكرة أثناء معالجة الملفات.
+⚡ PySpark Processing
+للملفات الكبيرة يتم استخدام:
 Apache Spark / PySpark
-يتم استخدام Spark لقراءة ومعالجة البيانات الكبيرة، ثم تحميلها إلى MongoDB.
-تم إعداد بيئة Spark المطلوبة للتشغيل على Windows، بما في ذلك إعدادات Hadoop المطلوبة.
-🗃️ 9. Raw Data Layer
-بعد قراءة البيانات يتم تحميلها أولاً إلى:
+يتم قراءة البيانات الكبيرة ومعالجتها بواسطة Spark، ثم إرسال البيانات إلى MongoDB.
+تم إعداد بيئة Spark على Windows مع إعدادات Hadoop المطلوبة لتشغيل Spark.
+🗃️ Raw Data Layer
+بعد قراءة الملف يتم تحميل البيانات أولاً إلى:
 orders_raw
 قبل تنفيذ عمليات التنظيف.
-هذه الخطوة مهمة لأن النظام يحتفظ بنسخة Raw من البيانات، مما يسمح بتتبع مصدر السجلات.
-يتم الاحتفاظ بمعلومات مثل:
+يتم الاحتفاظ بمعلومات تساعد على تتبع مصدر السجل، مثل:
 run_id
 source_file
 source_row_number
 ingested_at
 engine_used
 raw_record
-وبذلك يمكن معرفة مصدر السجل والـ Run الذي قام بإدخاله.
-🧹 10. Data Cleaning & Validation
-بعد تحميل البيانات الخام تبدأ مرحلة التنظيف والتحقق.
-يتعامل المشروع مع مجموعة من أخطاء جودة البيانات.
-قواعد التنظيف
-القاعدة                      الوظيفة
-Arabic Digits                تحويل الأرقام العربية Currency Normalization       توحيد تمثيل العملة Thousand Separators          معالجة فواصل الأسعار Word Prices                  معالجة الأسعار النصية Phone Formatting             توحيد أرقام الهواتف Email Repair                 معالجة أخطاء البريد الإلكتروني Date Normalization           توحيد صيغة التاريخ Order Status Normalization   توحيد حالة الطلب Total Recomputation          إعادة حساب إجمالي الطلب
-🚦 11. Classification & Quarantine
-بعد التنظيف والتحقق يتم تصنيف كل سجل.
-                    Record
-                       │
-             ┌─────────┴─────────┐
-             ▼                   ▼
-           Valid               Invalid
-             │                   │
-             ▼          ┌────────┴────────┐
-           VALID         ▼                 ▼
-                     Correctable      Not Correctable
-                         │                 │
-                         ▼                 ▼
-                     CORRECTED         QUARANTINE
+وبذلك يمكن تتبع:
+مصدر السجل.
+رقم الصف الأصلي.
+عملية التشغيل التي أدخلت السجل.
+المحرك المستخدم في المعالجة.
+🧹 Data Cleaning & Validation
+بعد Raw Layer يتم تنفيذ عمليات التنظيف والتحقق.
+يحتوي المشروع على مجموعة من قواعد Data Quality:
+Rule                         الوظيفة
+Arabic Digits                تحويل الأرقام العربية Currency Normalization       توحيد تمثيل العملات Thousand Separators          معالجة فواصل الأسعار Word Prices                  معالجة الأسعار المكتوبة كنص Phone Formatting             توحيد أرقام الهواتف Email Repair                 معالجة أخطاء البريد الإلكتروني Date Normalization           توحيد صيغ التاريخ Order Status Normalization   توحيد حالات الطلب Total Recomputation          إعادة حساب إجمالي الطلب
+🚦 Classification & Quarantine
+بعد تطبيق قواعد التنظيف والتحقق يتم تصنيف السجلات.
+                       Record
+                          │
+                ┌─────────┴─────────┐
+                │                   │
+              Valid               Invalid
+                │                   │
+                ▼          ┌────────┴────────┐
+              VALID         │                 │
+                            ▼                 ▼
+                       Correctable       Not Correctable
+                            │                 │
+                            ▼                 ▼
+                        CORRECTED         QUARANTINE
 ✅ VALID
 السجل صحيح ولا يحتاج إلى تعديل.
 🔧 CORRECTED
 السجل يحتوي على مشكلة يمكن إصلاحها.
-يتم الاحتفاظ بمعلومات التعديل كـ Audit Trail.
+ويتم الاحتفاظ بمعلومات التعديل كجزء من Audit Trail.
 ❌ QUARANTINE
-السجل غير صالح أو يحتوي على مشكلة لا يمكن تصحيحها بشكل آمن.
+السجل لا يمكن اعتماده أو تصحيحه بشكل آمن.
 يتم عزله في:
 orders_quarantine
-⚠️ Error Codes
-من أمثلة حالات الأخطاء التي يتعامل معها النظام:
+⚠️ Error Cases
+من الحالات التي يتعامل معها النظام:
 MISSING_ORDER_ID
 MISSING_CUSTOMER_ID
 EMPTY_ITEMS
@@ -210,24 +219,23 @@ UNKNOWN_PRICE
 DUPLICATE_ORDER_ID
 AMBIGUOUS_NEGATIVE_VALUE
 MULTIPLE_CONFLICTING_ERRORS
-🔄 12. Idempotent Upsert
-من المتطلبات الأساسية أن إعادة تشغيل نفس البيانات لا تؤدي إلى إنشاء سجلات مكررة.
-لذلك يعتمد النظام على:
+🔄 Idempotency & Upsert
+من أهم خصائص النظام إمكانية إعادة تشغيل نفس البيانات دون إنشاء Duplicates.
+يعتمد الـ Upsert في البيانات النهائية على:
 order_id
-في عملية Upsert للبيانات النهائية.
-التشغيل الأول
+First Run
 New Order
    ↓
 INSERT
-التشغيل مرة أخرى
+Second Run
 Same Order
    ↓
 UPDATE / UNCHANGED
-وبذلك يمكن إعادة تشغيل الـ Pipeline دون إنشاء Duplicates.
-📊 13. Metrics & Consistency
-يتم تسجيل معلومات التشغيل في:
+وهذا يجعل الـ Pipeline Idempotent عند إعادة تشغيل نفس البيانات.
+📊 Metrics & Consistency
+يتم تسجيل نتائج التشغيل في:
 reports/results.json
-ومن أهم الـ Metrics:
+ومن أهم المقاييس:
 run_id
 file_name
 file_size_mb
@@ -243,40 +251,47 @@ unchanged_count
 elapsed_seconds
 throughput
 error_case_counts
-Consistency Check
-يتم التحقق من:
+Consistency Equation
 raw_loaded =
 valid_count +
 corrected_count +
 quarantine_count
-هذه المعادلة تساعد على التأكد من أن جميع السجلات التي وصلت إلى Raw Layer تم تصنيفها في نهاية الـ Pipeline.
-🟣 14. Phase 2 - Analytics Layer
-Phase 2 تضيف طبقة التحليل والوصول إلى البيانات فوق نتائج Phase 1.
-تشمل:
-Queries
-Indexes
+تستخدم هذه المعادلة للتحقق من أن جميع السجلات التي تم تحميلها إلى Raw تم تصنيفها في نهاية الـ Pipeline.
+🟣 Phase 2 - Analytics Layer
+Phase 2 تضيف طبقة التحليل فوق بيانات Phase 1.
+orders_validated
+       │
+       ├──────────────► Queries
+       │
+       ├──────────────► Indexes
+       │
+       ├──────────────► Aggregations
+       │
+       ├──────────────► Materialized Views
+       │
+       ├──────────────► Scheduled Jobs
+       │
+       └──────────────► FastAPI
+🔎 Queries, Indexes & Explain
+تمت إضافة:
+5 Queries
+3 Indexes
+Compound Index
+MongoDB Explain
+الغرض من الـ Indexes هو تحسين الوصول إلى البيانات.
 Explain
-Aggregations
-Materialized Views
-Scheduled Jobs
-FastAPI
-🔎 15. Queries & Indexes
-تمت إضافة 5 Queries للتعامل مع بيانات الطلبات وتحليلها.
-كما تم إنشاء 3 Indexes، من بينها Compound Index.
-الهدف من الـ Indexes هو تحسين عمليات البحث والوصول إلى البيانات.
-Explain
-يتم استخدام MongoDB Explain لمقارنة تنفيذ الاستعلام قبل وبعد استخدام الـ Index.
+يتم استخدام Explain لمقارنة تنفيذ الاستعلام قبل وبعد إضافة الـ Index.
 Query
  │
  ├── Before Index
  │      ↓
- │   Collection Scan
+ │  Collection Scan
  │
  └── After Index
         ↓
      Index Scan
-وهذا يسمح بقياس تأثير الفهرسة على الاستعلامات.
-📈 16. Aggregation Reports
+وبذلك يمكن تقييم تأثير الفهرسة على الاستعلامات.
+📈 Aggregation Reports
 تم إنشاء 5 تقارير تحليلية باستخدام MongoDB Aggregation.
 1. Sales By City
 تحليل المبيعات حسب المدينة.
@@ -288,48 +303,46 @@ Query
 تحليل المبيعات حسب الفترة الزمنية.
 5. Order Status Distribution
 تحليل توزيع الطلبات حسب حالة الطلب.
-جميع التقارير تعتمد على البيانات الموجودة في MongoDB، وليست على بيانات ثابتة داخل الكود.
-🧱 17. Materialized Views
-تمت إضافة Materialized Views لتخزين نتائج تحليلية جاهزة.
-بدلاً من تنفيذ Aggregation في كل طلب، يمكن قراءة النتائج المخزنة مسبقاً.
-Views الموجودة
+جميع التقارير تعتمد على البيانات الموجودة في MongoDB، وليست على قيم ثابتة داخل الكود.
+🧱 Materialized Views
+تم إنشاء Materialized Views لتخزين نتائج تحليلية جاهزة.
+الموجود في المشروع:
 daily_sales_summary
 top_products_summary
 📅 daily_sales_summary
-تخزن ملخص المبيعات اليومية، مع التجميع حسب اليوم والمدينة.
+تخزن ملخص المبيعات اليومية مع التجميعات المطلوبة للتحليل.
 🏆 top_products_summary
 تخزن ملخص المنتجات الأعلى مبيعاً.
 🔄 Incremental Refresh
-يتم تحديث الـ Materialized Views بطريقة Incremental بدلاً من الاعتماد على إعادة بناء النتائج بشكل غير ضروري.
-يستخدم النظام Metadata مرتبطة بعملية التحديث:
+يتم تحديث الـ Views بطريقة Incremental.
+ويستخدم المشروع Metadata مرتبطة بعملية التحديث:
 mv_metadata
-⏰ 18. Scheduled Jobs
+⏰ Scheduled Jobs
 تم إنشاء Scheduler لتنفيذ المهام بشكل دوري.
 Job 1 --- Refresh Views
 تحديث Materialized Views.
 Job 2 --- Daily Report
 تشغيل التقرير الدوري وتسجيل نتيجة التنفيذ.
-يتم تسجيل معلومات مثل:
+يتم تسجيل معلومات التشغيل مثل:
 Start
 End
 Status
 Duration
-وهذا يساعد على متابعة نجاح وفشل المهام ووقت تنفيذها.
-🚀 19. FastAPI
-تم إنشاء API موحدة باستخدام FastAPI للوصول إلى وظائف المشروع.
-تشمل الواجهة وظائف مرتبطة بـ:
-Health Check
-Ingestion
+🚀 FastAPI
+تم إنشاء REST API موحدة للوصول إلى وظائف المشروع.
+تشمل الوظائف:
+Health
+Ingest
 Indexes
 Queries
 Aggregations
 Materialized Views
 Jobs
 Swagger
-بعد تشغيل API يمكن الوصول إلى:
+بعد تشغيل API:
 http://localhost:8000/docs
-ومن Swagger يمكن تجربة الـ API والاطلاع على الـ endpoints.
-🧩 20. Project Structure
+يمكن استخدام Swagger لتجربة الـ endpoints ومراجعة توثيقها.
+🧩 Project Structure
 midterm-data-pipeline/
 │
 ├── config/
@@ -368,152 +381,143 @@ midterm-data-pipeline/
 ├── .gitignore
 ├── requirements.txt
 └── README.md
-⚙️ 21. Installation
-المتطلبات
+⚙️ Installation & Configuration
+Requirements
 Python 3.10+
 Java JDK 11+
 MongoDB 6.0+
 PySpark 3.5+
-تثبيت المكتبات
-على Windows:
+Install Dependencies
+على Windows PowerShell:
 py -m pip install -r requirements.txt
 في بيئة Windows المستخدمة للمشروع يتم استخدام py بدلاً من python.
 Environment Variables
-أنشئ ملف:
-.env
-بالاعتماد على:
+استخدم:
 .env.example
-ولا تضع أي بيانات سرية داخل GitHub.
-▶️ 22. Running the Project
-تشغيل Phase 1
+كمرجع لإنشاء:
+.env
+ولا تضع البيانات السرية داخل GitHub.
+▶️ Running the Project
+Phase 1
 py src/main.py
-تشغيل Queries
+Queries
 py src/queries.py
-تشغيل Aggregations
+Aggregations
 py src/aggregations.py
-تشغيل Materialized Views
+Materialized Views
 py src/materialized_views.py
-تشغيل Scheduler
+Scheduler
 py src/scheduler.py
-تشغيل FastAPI
+FastAPI
 py src/api.py
-بعد ذلك افتح:
+ثم:
 http://localhost:8000/docs
-🧪 23. Testing
+🧪 Testing
 لتشغيل الاختبارات:
 py -m pytest tests/ -v
-الاختبارات الموجودة تغطي وظائف مرتبطة بقواعد التنظيف والتصنيف في Phase 1.
-🗄️ 24. MongoDB Collections
+وتستخدم الاختبارات للتحقق من وظائف التنظيف والتصنيف الأساسية في المشروع.
+🗄️ MongoDB Collections
 Phase 1
 orders_raw
 orders_validated
 orders_quarantine
 Phase 2
-يتم استخدام Collections مرتبطة بالـ Materialized Views والـ Metadata والـ Job Logs وفق تنفيذ الطبقة التحليلية.
-🛠️ 25. Technologies
-Technology     الاستخدام
-Python         Batch Processing & Pipeline Apache Spark   معالجة البيانات الكبيرة PySpark        تنفيذ Spark MongoDB        التخزين والتحليل FastAPI        REST API Pytest         Testing Java           تشغيل Spark Hadoop         دعم Spark على Windows
-🔁 26. End-to-End Flow
-                  CSV File
-                     │
-                     ▼
-               File Router
-                     │
-          ┌──────────┴──────────┐
-          ▼                     ▼
-   Python Batch             PySpark
-          │                     │
-          └──────────┬──────────┘
-                     ▼
-                orders_raw
-                     │
-                     ▼
-          Cleaning & Validation
-                     │
-          ┌──────────┼──────────┐
-          ▼          ▼          ▼
-        VALID     CORRECTED  QUARANTINE
-          │          │          │
-          └────┬─────┘          │
-               ▼                ▼
-       orders_validated   orders_quarantine
-               │
-               ▼
-            Analytics
-               │
-      ┌────────┼────────┐
-      ▼        ▼        ▼
-   Queries  Reports   Views
-                         │
-                         ▼
-                     Scheduler
-                         │
-                         ▼
-                      FastAPI
-🎯 27. ملخص المتطلبات المنفذة
-Phase 1
-Hybrid Data Processing
-Python Batch
-PySpark
-File Router
-200 MB Threshold
-Raw Data Layer
-Data Cleaning
+توجد Collections مرتبطة بالـ Materialized Views والـ Metadata والـ Job Logs وفق تنفيذ الطبقة التحليلية.
+🛠️ Technologies
+Technology     Usage
+Python         Batch Processing & Pipeline Apache Spark   Large File Processing PySpark        Spark Processing MongoDB        Storage & Analytics PyMongo        MongoDB Access FastAPI        REST API Pytest         Testing Java           Spark Runtime Hadoop         Spark Support on Windows Git / GitHub   Version Control
+🔁 End-to-End Flow
+                         CSV
+                          │
+                          ▼
+                    File Router
+                          │
+              ┌───────────┴───────────┐
+              ▼                       ▼
+       Python Batch               PySpark
+              │                       │
+              └───────────┬───────────┘
+                          ▼
+                     orders_raw
+                          │
+                          ▼
+                Cleaning + Validation
+                          │
+             ┌────────────┼────────────┐
+             ▼            ▼            ▼
+           VALID       CORRECTED   QUARANTINE
+             │            │            │
+             └─────┬──────┘            │
+                   ▼                   ▼
+            orders_validated    orders_quarantine
+                   │
+                   ▼
+                Analytics
+                   │
+        ┌──────────┼───────────┐
+        ▼          ▼           ▼
+     Queries   Aggregations   Views
+                                │
+                                ▼
+                            Scheduler
+                                │
+                                ▼
+                             FastAPI
+📦 Phase 1 Deliverables
+✓ Hybrid Processing
+✓ File Router
+✓ 200 MB Threshold
+✓ Python Batch
+✓ PySpark
+✓ Raw Data Layer
+✓ Data Cleaning
+✓ Validation
+✓ Corrected Records
+✓ Quarantine
+✓ Error Classification
+✓ Idempotent Upsert
+✓ Metrics
+✓ Consistency Check
+📦 Phase 2 Deliverables
+✓ 5 Queries
+✓ 3 Indexes
+✓ Compound Index
+✓ Explain
+✓ 5 Aggregation Reports
+✓ daily_sales_summary
+✓ top_products_summary
+✓ Incremental Refresh
+✓ 2 Scheduled Jobs
+✓ FastAPI
+✓ Swagger Documentation
+🎓 Conclusion
+المشروع يمثل نظاماً متكاملاً لمعالجة بيانات الطلبات باستخدام Hybrid Processing.
+يبدأ النظام من:
+CSV
+ ↓
+Routing
+ ↓
+Processing
+ ↓
+Raw Layer
+ ↓
+Cleaning
+ ↓
 Validation
-Corrected Records
-Quarantine
-Error Codes
-Audit Trail
-Idempotent Upsert
-Metrics
-Consistency Check
-Phase 2
-5 Queries
-3 Indexes
-Compound Index
-Explain
-5 Aggregation Reports
-2 Materialized Views
-Incremental Refresh
-2 Scheduled Jobs
-FastAPI
-Swagger Documentation
-🎓 الخلاصة
-المشروع يقدم Pipeline متكامل لمعالجة بيانات الطلبات يبدأ من ملفات CSV وينتهي بطبقة تحليلية وواجهة API.
-الـ Pipeline يجمع بين:
-Big Data
-+
-ELT
-+
-Data Quality
-+
-MongoDB
-+
-Apache Spark
-+
+ ↓
+Classification
+ ↓
+Upsert
+ ↓
 Analytics
-+
-REST API
-والتدفق النهائي للنظام هو:
-Read
  ↓
-Route
+Materialized Views
  ↓
-Load
+Scheduled Jobs
  ↓
-Clean
- ↓
-Validate
- ↓
-Classify
- ↓
-Store
- ↓
-Analyze
- ↓
-Summarize
- ↓
-Expose through API
+FastAPI
+وبذلك يجمع المشروع بين:
+Big Data + ELT + Data Quality + Apache Spark + MongoDB + Analytics + REST API
 🔗 GitHub
 Repository:
 https://github.com/mohammedalrubai/midterm-data-pipeline
