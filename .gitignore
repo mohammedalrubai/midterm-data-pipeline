@@ -1,4 +1,25 @@
+# Data files (large CSVs)
 data/*.csv
+
+# Python
 __pycache__/
 *.pyc
+*.pyo
 .pytest_cache/
+
+# Environment
+.env
+venv/
+.venv/
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+Thumbs.db
+.DS_Store
+
+# Reports (auto-generated)
+reports/results.json
+reports/screenshots/*.png

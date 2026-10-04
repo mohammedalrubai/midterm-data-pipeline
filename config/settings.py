@@ -68,3 +68,21 @@ CSV_COLUMNS = [
 # Valid Statuses (canonical values)
 # ──────────────────────────────────────────────
 VALID_STATUSES = ["مؤكد", "قيد الانتظار", "قيد الشحن", "تم التسليم", "مرتجع", "ملغي"]
+
+# ──────────────────────────────────────────────
+# Phase 2: Materialized Views
+# ──────────────────────────────────────────────
+MV_DAILY_SALES = "daily_sales_summary"
+MV_TOP_PRODUCTS = "top_products_summary"
+
+# ──────────────────────────────────────────────
+# Phase 2: Scheduled Jobs
+# ──────────────────────────────────────────────
+JOB_LOGS_COLLECTION = "job_logs"
+SCHEDULER_INTERVAL_MINUTES = int(os.environ.get("SCHEDULER_INTERVAL_MINUTES", "60"))
+
+# ──────────────────────────────────────────────
+# Phase 2: API
+# ──────────────────────────────────────────────
+API_HOST = os.environ.get("API_HOST", "0.0.0.0")
+API_PORT = int(os.environ.get("API_PORT", "8000"))
