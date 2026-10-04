@@ -191,7 +191,4 @@ CSV File → File Router → [Python Batch | PySpark] → orders_raw
 raw_loaded = valid_count + corrected_count + quarantine_count
 ```
 
-## Idempotency
 
-- التشغيل الأول: جميع السجلات → inserted
-- التشغيل الثاني (نفس البيانات): لا duplicate، سجلات → updated أو unchanged
